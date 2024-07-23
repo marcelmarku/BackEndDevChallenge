@@ -8,8 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<CalculatorContext>(options =>
-       options.UseSqlServer(CalculatorContext.ConnectionString));
-
+       options.UseSqlServer(builder.Configuration.GetConnectionString("MathDatabase")));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
