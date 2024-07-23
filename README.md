@@ -1,7 +1,15 @@
 # BackEndDevChallenge
 
 Setup Instructions:
+Update the connection string for MathDatabase in the appsettings.json file to match your local environment. Do not store credentials and other identifying data
 
+Apply Database Migration:
+Run the UpdateMathProblem migration to update the database. 
+
+Logging
+The application will create a Logs table for logging system exceptions.
+
+-------------------------------------------------
 Fork the Repository:
 Fork the public repository into your own GitHub account.
 
