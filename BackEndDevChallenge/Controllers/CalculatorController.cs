@@ -45,9 +45,9 @@ namespace BackEndDevChallenge.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occured Adding {input1} and {input2} for User: {User}", input1, input2, GetUserName(userName));
                 response.ErrorMessage = ex.Message;
                 response.ErrorType = ErrorType.SystemError.ToString();
-                await SaveMathProblem(GetUserName(userName), input1, input2, null, MathOperationType.Addition, ErrorType.SystemError, ex.Message);
                 return BadRequest(response);
             }
 
@@ -84,9 +84,9 @@ namespace BackEndDevChallenge.Controllers
             
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occured Subtracting {input1} and {input2} for User: {User}", input1, input2, GetUserName(userName));
                 response.ErrorMessage = ex.Message;
                 response.ErrorType = ErrorType.SystemError.ToString();
-                await SaveMathProblem(GetUserName(userName), input1, input2, null, MathOperationType.Subtraction, ErrorType.SystemError, ex.Message);
                 return BadRequest(response);
             }
 
@@ -121,9 +121,9 @@ namespace BackEndDevChallenge.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occured Dividing {input1} and {input2} for User: {User}", input1, input2, GetUserName(userName));
                 response.ErrorMessage = ex.Message;
                 response.ErrorType = ErrorType.SystemError.ToString();
-                await SaveMathProblem(GetUserName(userName), input1, input2, null, MathOperationType.Division, ErrorType.SystemError, ex.Message);
                 return BadRequest(response);
             }
             
@@ -147,7 +147,7 @@ namespace BackEndDevChallenge.Controllers
                 {
                     throw new ArgumentException("Input values cannot be zero. Supply a number greater or less than zero.");                    
                 }
-
+                
                 response.Result = input1 * input2;
                 await SaveMathProblem(GetUserName(userName), input1, input2, response.Result, MathOperationType.Multiplication, ErrorType.None, null);
             }
@@ -160,9 +160,9 @@ namespace BackEndDevChallenge.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex,"An error occured Multiplying {input1} and {input2} for User: {User}",input1,input2,GetUserName(userName));
                 response.ErrorMessage = ex.Message;
                 response.ErrorType = ErrorType.SystemError.ToString();
-                await SaveMathProblem(GetUserName(userName), input1, input2, null, MathOperationType.Multiplication, ErrorType.SystemError, ex.Message);
                 return BadRequest(response);
             }
 
@@ -175,6 +175,7 @@ namespace BackEndDevChallenge.Controllers
         {
             try
             {
+                
                 var userReport = await _context.MathProblems
                 .GroupBy(m => m.UserName)
                 .Select(u => new UserData
@@ -188,6 +189,7 @@ namespace BackEndDevChallenge.Controllers
             }
             catch(Exception ex)
             {
+                _logger.LogError(ex, "An error occurred in UserDataReport");
                 return BadRequest(ex.Message);
             }
             
@@ -210,6 +212,7 @@ namespace BackEndDevChallenge.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred in ErrorTypes");
                 return BadRequest(ex.Message);
             }
 
@@ -233,6 +236,7 @@ namespace BackEndDevChallenge.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred in CommonAnswer");
                 return BadRequest(ex.Message);
             }
 
@@ -243,20 +247,28 @@ namespace BackEndDevChallenge.Controllers
 
         private async Task SaveMathProblem(string? userName,int input1, int input2, double? result, MathOperationType operationType,ErrorType errorType,string? errorMessage)
         {
-            var mathProblem = new MathProblem
+            try
             {
-                UserName = userName,
-                Input1 = input1,
-                Input2 = input2,
-                Result = result,
-                OperationType = operationType,
-                ErrorType = errorType,
-                ErrorMessage = errorMessage,
-                Timestamp = DateTime.Now
-            };
+                var mathProblem = new MathProblem
+                {
+                    UserName = userName,
+                    Input1 = input1,
+                    Input2 = input2,
+                    Result = result,
+                    OperationType = operationType,
+                    ErrorType = errorType,
+                    ErrorMessage = errorMessage,
+                    Timestamp = DateTime.Now
+                };
 
-            _context.MathProblems.Add(mathProblem);
-            await _context.SaveChangesAsync();
+                _context.MathProblems.Add(mathProblem);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,"An error occurred in SaveMathProblem");
+            }
+            
         }
 
         private string? GetUserName(string? userName)
